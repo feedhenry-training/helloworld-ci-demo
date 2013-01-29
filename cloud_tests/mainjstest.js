@@ -1,6 +1,7 @@
 var assert = require("assert");
 var util = require('util');
-var nodeapp = require("fh-nodeapp"); 
+var nodeapp = require("node_modules/fh-nodeapp/lib/fh-nodeapp.js"); 
+var mainjs = require("main.js");
 var request = require('request');
 
 var ROOT_URL = 'http://localhost:8001';
@@ -11,7 +12,7 @@ suite('RestAPI', function(){
   // Run fh-nodeapp on setup
   suiteSetup(function(done){
     nodeapp.HostApp.init();
-    nodeapp.HostApp.serveApp(require('main.js'), function(err){
+    nodeapp.HostApp.serveApp(mainjs, function(err){
       done(err);
     });
   });

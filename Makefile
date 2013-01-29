@@ -1,14 +1,17 @@
 CLOUDTESTS = cloud_tests/*.js
 NODEPATH = `pwd`/cloud:`pwd`/shared
+NODEPATH_COVERAGE = `pwd`/cloud-cov:`pwd`/shared
+REPORTER = dot
 
-all: deps test
+all: clean deps test-cov
 
 test: cloudtest
+test-cov: cloudtest-cov
 
 cloudtest:
-	env NODE_PATH=$(NODEPATH)  ./node_modules/.bin/mocha \
+	@env NODE_PATH=$(NODEPATH) ./node_modules/.bin/mocha \
     --ui tdd \
-		--reporter dot \
+		--reporter $(REPORTER) \
     --globals fh-nodeapp \
     --globals fh \
     --globals fhserver \
@@ -16,12 +19,17 @@ cloudtest:
 		$(CLOUDTESTS)
 
 deps:
+	cd cloud; npm install .
 	npm install . 
 
-test-cov: lib-cov
-	@CONNECT_COV=1 $(MAKE) test REPORTER=html-cov > coverage.html
+cloudtest-cov: cloud-cov
+	@$(MAKE) test REPORTER=html-cov NODEPATH=$(NODEPATH_COVERAGE) > cloudcoverage.html
 
-lib-cov:
-	@jscoverage lib $@
+cloud-cov:
+	@jscoverage --no-instrument=node_modules cloud $@
 
-.PHONY: test-cov test cloudtest all deps
+clean: 
+	rm -rf cloud-cov
+	rm -rf node_modules
+
+.PHONY: cloud-cov test cloudtest all deps
